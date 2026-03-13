@@ -9,10 +9,10 @@ BLUE=$'\033[1;34m'
 YELLOW=$'\033[1;33m'
 RED=$'\033[1;31m'
 
-info()    { echo "${BLUE}${BOLD}==>${RESET} $1"; }
+info() { echo "${BLUE}${BOLD}==>${RESET} $1"; }
 success() { echo "${GREEN}${BOLD} ✔${RESET} $1"; }
-warn()    { echo "${YELLOW}${BOLD} !${RESET} $1"; }
-error()   { echo "${RED}${BOLD} ✘${RESET} $1"; }
+warn() { echo "${YELLOW}${BOLD} !${RESET} $1"; }
+error() { echo "${RED}${BOLD} ✘${RESET} $1"; }
 
 REPO_URL="https://github.com/SadDevastator/profile"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
@@ -20,19 +20,19 @@ DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 # --- Clone or locate repo ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ ! -d "$SCRIPT_DIR/config" ]; then
-    if [ -d "$DOTFILES_DIR/.git" ]; then
-        info "Updating existing dotfiles at $DOTFILES_DIR..."
-        git -C "$DOTFILES_DIR" pull --ff-only
-        success "Dotfiles updated"
-    else
-        info "Cloning dotfiles from $REPO_URL..."
-        git clone "$REPO_URL" "$DOTFILES_DIR"
-        success "Repository cloned to $DOTFILES_DIR"
-    fi
-    cd "$DOTFILES_DIR"
+	if [ -d "$DOTFILES_DIR/.git" ]; then
+		info "Updating existing dotfiles at $DOTFILES_DIR..."
+		git -C "$DOTFILES_DIR" pull --ff-only
+		success "Dotfiles updated"
+	else
+		info "Cloning dotfiles from $REPO_URL..."
+		git clone "$REPO_URL" "$DOTFILES_DIR"
+		success "Repository cloned to $DOTFILES_DIR"
+	fi
+	cd "$DOTFILES_DIR"
 else
-    cd "$SCRIPT_DIR"
-    info "Running from local repo at $SCRIPT_DIR"
+	cd "$SCRIPT_DIR"
+	info "Running from local repo at $SCRIPT_DIR"
 fi
 
 # --- Copy configuration files ---
@@ -52,42 +52,42 @@ ZSH_CUSTOM_DIR="$ZSH_DIR/custom"
 
 info "Setting up Oh My Zsh..."
 if [ ! -d "$ZSH_DIR" ]; then
-    git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH_DIR"
-    success "Oh My Zsh installed"
+	git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH_DIR"
+	success "Oh My Zsh installed"
 else
-    warn "Oh My Zsh already installed, skipping"
+	warn "Oh My Zsh already installed, skipping"
 fi
 
 # --- Zsh plugins ---
 info "Installing Zsh plugins..."
 
 if [ ! -d "$ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions" ]; then
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
-    success "zsh-autosuggestions installed"
+	git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
+	success "zsh-autosuggestions installed"
 else
-    warn "zsh-autosuggestions already installed, skipping"
+	warn "zsh-autosuggestions already installed, skipping"
 fi
 
 if [ ! -d "$ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting" ]; then
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting"
-    success "zsh-syntax-highlighting installed"
+	git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting"
+	success "zsh-syntax-highlighting installed"
 else
-    warn "zsh-syntax-highlighting already installed, skipping"
+	warn "zsh-syntax-highlighting already installed, skipping"
 fi
 
 # --- Powerlevel10k ---
 info "Installing Powerlevel10k..."
 if [ ! -d "$ZSH_CUSTOM_DIR/themes/powerlevel10k" ]; then
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM_DIR/themes/powerlevel10k"
-    success "Powerlevel10k installed"
+	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM_DIR/themes/powerlevel10k"
+	success "Powerlevel10k installed"
 else
-    warn "Powerlevel10k already installed, skipping"
+	warn "Powerlevel10k already installed, skipping"
 fi
 
 if [ -f "$HOME/.p10k.zsh" ]; then
-    success "Powerlevel10k config found at ~/.p10k.zsh"
+	success "Powerlevel10k config found at ~/.p10k.zsh"
 else
-    warn "No ~/.p10k.zsh found — run 'p10k configure' after first login"
+	warn "No ~/.p10k.zsh found — run 'p10k configure' after first login"
 fi
 
 # --- Default shell ---
@@ -99,13 +99,13 @@ cd ~
 
 # --- Rust ---
 info "Checking Rust installation..."
-if ! command -v rustc &> /dev/null; then
-    info "Rust not found, installing via rustup..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    source "$HOME/.cargo/env"
-    success "Rust installed"
+if ! command -v rustc &>/dev/null; then
+	info "Rust not found, installing via rustup..."
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+	source "$HOME/.cargo/env"
+	success "Rust installed"
 else
-    warn "Rust already installed, skipping"
+	warn "Rust already installed, skipping"
 fi
 
 # --- pokeget ---
@@ -124,8 +124,8 @@ export RUSTFLAGS="-C target-cpu=native"
 info "Installing/Updating WezTerm..."
 
 if ! command -v rustup >/dev/null 2>&1; then
-    error "Rustup not found. Install rustup first."
-    exit 1
+	error "Rustup not found. Install rustup first."
+	exit 1
 fi
 
 info "Updating Rust toolchain..."
@@ -134,16 +134,16 @@ rustup default stable
 success "Rust toolchain updated"
 
 if [ ! -d "$WEZ_DIR/.git" ]; then
-    info "Cloning WezTerm repository..."
-    git clone --branch=main --recursive "$REPO" "$WEZ_DIR"
-    success "WezTerm repository cloned"
+	info "Cloning WezTerm repository..."
+	git clone --branch=main --recursive "$REPO" "$WEZ_DIR"
+	success "WezTerm repository cloned"
 else
-    info "Updating WezTerm repository..."
-    cd "$WEZ_DIR"
-    git fetch origin main
-    git reset --hard origin/main
-    git submodule update --init --recursive
-    success "WezTerm repository updated"
+	info "Updating WezTerm repository..."
+	cd "$WEZ_DIR"
+	git fetch origin main
+	git reset --hard origin/main
+	git submodule update --init --recursive
+	success "WezTerm repository updated"
 fi
 
 cd "$WEZ_DIR"
@@ -153,7 +153,7 @@ info "Installing WezTerm dependencies..."
 success "Dependencies installed"
 
 mkdir -p .cargo
-cat > .cargo/config.toml <<EOF
+cat >.cargo/config.toml <<EOF
 [build]
 jobs = $JOBS
 
