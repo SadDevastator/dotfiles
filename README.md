@@ -31,7 +31,7 @@ Backup of my personal Linux user profile and application configuration files.
 **One-liner (run directly from GitHub):**
 
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/SadDevastator/profile/main/install.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/SadDevastator/dotfiles/main/install.sh)
 ```
 
 **Or clone and run locally:**
@@ -43,7 +43,7 @@ bash ~/.dotfiles/install.sh
 
 The script will:
 
-1. Copy `config/` to `~/.config/` and `profile/` to `~/`
+1. Copy `config/` to `~/.config/` and `dotfiles` to `~/`
 2. Precompile Zsh scripts
 3. Clone [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.zsh/ohmyzsh/`
 4. Change the default shell to Zsh
