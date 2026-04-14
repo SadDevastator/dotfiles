@@ -97,7 +97,7 @@ end)
 -- Scrollback
 -------------------------------------------------
 config.scrollback_lines = 10000
-config.enable_scroll_bar = true
+config.enable_scroll_bar = false
 
 -------------------------------------------------
 -- Cursor
