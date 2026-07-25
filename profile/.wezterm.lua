@@ -10,7 +10,7 @@ local config = {}
 -- Appearance
 -------------------------------------------------
 config.window_background_opacity = 0.12
-config.kde_window_background_blur = true
+config.wayland_window_background_blur = true
 config.window_decorations = "NONE"
 
 -- Default window size
