@@ -12,10 +12,11 @@ local config = {}
 config.window_background_opacity = 0.12
 config.wayland_window_background_blur = true
 config.window_decorations = "NONE"
+config.webgpu_power_preference = "HighPerformance"
 
 -- Default window size
-config.initial_cols = 128
-config.initial_rows = 36
+-- config.initial_cols = 128
+-- config.initial_rows = 36
 
 -- Font
 config.font = wezterm.font("FiraCode Nerd Font")

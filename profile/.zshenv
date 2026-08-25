@@ -8,3 +8,6 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 export PATH="/usr/local/texlive/2025/bin/x86_64-linux:$PATH"
 export PATH="$HOME/go/bin:$PATH"
+export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+export PATH="$HOME/.npm-global/bin:$PATH"
+. "$HOME/.cargo/env"

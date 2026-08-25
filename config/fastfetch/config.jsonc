@@ -2,7 +2,7 @@
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
     "type": "command-raw",
-    "source": "((RANDOM%4096 == 0)) && pokeget random --shiny || pokeget random",
+    "source": "$HOME/.config/fastfetch/logo.sh",
     "padding": {
       "top": 2,
       "left": 1,
@@ -10,7 +10,12 @@
     }
   },
   "display": {
-    "separator": "  "
+    "separator": "  ",
+    // Clip rows that are wider than the space beside the sprite instead of
+    // wrapping them onto the next line, where they would collide with the
+    // logo. This is fastfetch's default; set explicitly so the layout does
+    // not depend on that default staying true.
+    "disableLinewrap": true
   },
   "modules": [
     // Title
@@ -41,7 +46,7 @@
     },
     {
       "type": "packages",
-      "key": "{#separator}│  {#keys}󰏖 Packages",
+      "key": "{#separator}│  {#keys}󰏖 Packages"
     },
     {
       "type": "custom",
@@ -108,12 +113,13 @@
     {
       "type": "disk",
       "key": "{#separator}│  {#keys}󰋊 Disk ({mountpoint})",
-      "showMountpoints": true
     },
     // Footer
     {
-      "type": "custom",
-      "format": "{#1}╰─────────────────────────────────────────────────────────────╯"
+      "type": "command",
+      "key": "{#1}",
+      "text": "$HOME/.config/fastfetch/footer.sh",
+      "format": "{#1}{result}"
     }
   ]
 }

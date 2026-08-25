@@ -47,12 +47,13 @@ alias djcreatesuperuser="python manage.py createsuperuser"
 # --- Shell / zsh helpers ---
 alias reloadzsh="source ~/.zshrc"
 alias zshreload="source ~/.zshrc"
-alias zshconfig="code ~/.zshrc ~/.zsh/ ~/.zshenv ~/.zlogin"
+alias zshconfig="zeditor ~/.zshrc ~/.zsh/ ~/.zshenv ~/.zlogin"
 alias precompile="sh $HOME/.zsh/bin/precompile_zsh.sh"
 alias p10kconfig="p10k configure"
 alias imgcat="wezterm imgcat"
 alias clr="clear && fastfetch"
 alias rsync='rsync -zavhP --exclude="node_modules" --exclude="_pycache_" --exclude=".venv"'
+alias zed="zeditor"
 
 # --- Utilities / misc ---
 alias ports="sudo lsof -i -P -n | grep LISTEN"
