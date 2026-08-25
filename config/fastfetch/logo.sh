@@ -162,8 +162,28 @@ if [[ -n $name && -r $POKEDEX ]]; then
   ) || { dex=""; types=""; }
 fi
 
-# Line 1: dimmed #dex, then the name in bold.
-# Shiny caption. A glyph on its own is easy to miss against a sprite you may
+# An unrecognised Pokemon almost always means pokeget gained sprites that
+# pokedex.tsv predates, so kick off a refresh -- but never make the prompt wait
+# for it. This run still renders with just the name; the next one has the data.
+#
+# stdin/stdout/stderr are ALL redirected away from the child: fastfetch reads
+# this script's stdout and waits for EOF, so a background job holding it open
+# would stall the render, defeating the point.
+#
+# The stamp makes it fire at most once per boot ($XDG_RUNTIME_DIR is cleared on
+# reboot), so a Pokemon that genuinely has no typing upstream cannot turn every
+# fetch into a network request. Delete the stamp to allow another attempt.
+if [[ -z $dex && -n $name ]]; then
+  updater="${BASH_SOURCE[0]%/*}/update-pokedex.sh"
+  stamp="${XDG_RUNTIME_DIR:-/tmp}/fastfetch-pokedex-refresh.stamp"
+  if [[ -x $updater && ! -e $stamp ]]; then
+    : >"$stamp" 2>/dev/null
+    ( setsid "$updater" >/dev/null 2>&1 </dev/null & ) >/dev/null 2>&1 </dev/null
+  fi
+fi
+
+# Line 1: dimmed #dex then the name in bold, or the shiny treatment below.
+# A glyph on its own is easy to miss against a sprite you may
 # not know the normal colours of, so the whole caption shifts to gold -- the
 # colour change is what actually reads at a glance, the sparkle just names it.
 sparkle=$'\U000F0674'          # md-creation
