@@ -184,6 +184,15 @@ if command -v cargo &>/dev/null; then
     }
 fi
 
+# --- bun ---
+if [[ -s "$HOME/.bun/_bun" ]]; then
+    bun() {
+        unfunction bun
+        source "$HOME/.bun/_bun"
+        bun "$@"
+    }
+fi
+
 # --- pip / python extras ---
 pip() {
     unfunction pip 2>/dev/null
@@ -224,7 +233,8 @@ if command -v ufw &>/dev/null; then
 fi
 
 # --- rsync ---
-rsync() {
+# `function` keyword: aliases.zsh defines an rsync alias, and `rsync() {` would alias-expand
+function rsync {
     unfunction rsync 2>/dev/null
     source "$ZSH/plugins/rsync/rsync.plugin.zsh" 2>/dev/null
     command rsync "$@"

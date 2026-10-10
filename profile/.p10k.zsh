@@ -219,6 +219,8 @@
   typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=
   # Custom icon.
   # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
+  # CachyOS isn't recognized by p10k (falls back to Tux); use the Arch logo.
+  [[ -r /etc/os-release ]] && grep -qx 'ID=cachyos' /etc/os-release && typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=''
 
   ################################[ prompt_char: prompt symbol ]################################
   # Green prompt symbol if the last command succeeded.

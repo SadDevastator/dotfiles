@@ -15,8 +15,8 @@ config.window_decorations = "NONE"
 config.webgpu_power_preference = "HighPerformance"
 
 -- Default window size
--- config.initial_cols = 128
--- config.initial_rows = 36
+config.initial_cols = 128
+config.initial_rows = 36
 
 -- Font
 config.font = wezterm.font("FiraCode Nerd Font")
@@ -90,7 +90,8 @@ config.colors = {
 
 -- Status line replaces title bar
 wezterm.on("update-status", function(window, pane)
-  local title = window:active_pane():title()
+  pane = pane or window:active_pane()
+  local title = pane and pane:get_title() or ""
   window:set_right_status(wezterm.format({ { Text = " " .. title .. " " } }))
 end)
 
