@@ -153,8 +153,24 @@ wezterm.on("decrease-height", function(window, pane)
   window:set_inner_size(dim.pixel_width, math.max(100, dim.pixel_height - step_height))
 end)
 
+-- Kitty keyboard protocol: lets apps that opt in (yazi) tell Ctrl+Shift+Z from Ctrl+Z
+config.enable_kitty_keyboard = true
+
+-- Ctrl+Shift+Z: send to yazi (zoxide jump) when it's in front, otherwise zoom the pane
+local function zoom_or_yazi(window, pane)
+  local proc = pane:get_foreground_process_name() or ""
+  if proc:match("yazi$") then
+    window:perform_action(wezterm.action.SendKey { key = "z", mods = "CTRL|SHIFT" }, pane)
+  else
+    window:perform_action(wezterm.action.TogglePaneZoomState, pane)
+  end
+end
+
 -- Key bindings
 config.keys = {
+
+  { key = "Z", mods = "CTRL|SHIFT", action = wezterm.action_callback(zoom_or_yazi) },
+  { key = "z", mods = "CTRL|SHIFT", action = wezterm.action_callback(zoom_or_yazi) },
 
   -- Toggle fullscreen
   {

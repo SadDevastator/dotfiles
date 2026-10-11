@@ -9,8 +9,12 @@ Backup of my personal Linux user profile and application configuration files.
 ├── install.sh          # Setup script
 ├── config/             # XDG config files (~/.config/)
 │   ├── fastfetch/      # Fastfetch system info display
-│   └── tealdeer/       # Tealdeer (tldr) styling
+│   ├── tealdeer/       # Tealdeer (tldr) styling
+│   ├── topgrade.toml   # Topgrade, incl. WezTerm source-build step
+│   ├── xkb/            # Remaps the Copilot key to F23 so KDE can bind it
+│   └── yazi/           # Yazi keymap (Ctrl+Shift+Z: zoxide jump)
 └── profile/            # Home directory dotfiles (~/  )
+    ├── .local/bin/yazi-claude  # Copilot key: yazi, then Claude in the chosen folder
     ├── .wezterm.lua    # WezTerm terminal config
     ├── .zshenv         # Zsh environment variables (all shells)
     ├── .zshrc          # Zsh interactive shell config

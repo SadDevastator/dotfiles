@@ -1,0 +1,7 @@
+# Ctrl+Shift+Z: jump to a frequent directory via zoxide (interactive, like `zi`).
+# WezTerm forwards this key to yazi only when yazi is the foreground process
+# (see ~/.wezterm.lua); elsewhere it still toggles pane zoom.
+[[mgr.prepend_keymap]]
+on   = "<C-Z>"
+run  = "plugin zoxide"
+desc = "Jump to a directory via zoxide"

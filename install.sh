@@ -172,5 +172,33 @@ mkdir -p "$BIN_DIR"
 ln -sf "$WEZ_DIR/target/release/wezterm" "$BIN_DIR/wezterm"
 success "WezTerm linked"
 
+# --- Copilot key → yazi → Claude (KDE Plasma) ---
+# The Copilot key sends Meta+Shift+XF86Assistant, which Qt can't bind; the xkb
+# option in ~/.config/xkb (copied above) remaps it to F23.
+if command -v kwriteconfig6 >/dev/null 2>&1; then
+	info "Setting up Copilot key launcher..."
+	mkdir -p "$HOME/.local/share/applications"
+	cat >"$HOME/.local/share/applications/yazi-claude.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Yazi → Claude
+Comment=Pick a folder in yazi, then open Claude there
+Exec=$BIN_DIR/wezterm start --always-new-process -- $BIN_DIR/yazi-claude
+Icon=utilities-terminal
+Terminal=false
+EOF
+	opts=$(kreadconfig6 --file kxkbrc --group Layout --key Options)
+	case ",$opts," in
+	*,custom:copilot_f23,*) ;;
+	*) kwriteconfig6 --file kxkbrc --group Layout --key Options "${opts:+$opts,}custom:copilot_f23" ;;
+	esac
+	kwriteconfig6 --file kxkbrc --group Layout --key ResetOldOptions true
+	kwriteconfig6 --file kglobalshortcutsrc --group services --group yazi-claude.desktop \
+		--key _launch $'Meta+Shift+F23\tMeta+F23'
+	success "Copilot key bound (log out and back in to apply)"
+else
+	warn "kwriteconfig6 not found (not KDE?), skipping Copilot key setup"
+fi
+
 echo
 success "All done! Restart your shell or run: exec zsh"

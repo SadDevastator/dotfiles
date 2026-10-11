@@ -1,0 +1,4 @@
+! include %S/evdev
+
+! option = symbols
+  custom:copilot_f23 = +copilot(f23)

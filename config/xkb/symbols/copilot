@@ -1,0 +1,4 @@
+// Copilot key: send plain F23 (Qt has no XF86Assistant key, so KDE can't bind it)
+xkb_symbols "f23" {
+    replace key <FK23> { type = "PC_SHIFT_SUPER_LEVEL2", symbols[Group1] = [ F23, F23 ] };
+};
