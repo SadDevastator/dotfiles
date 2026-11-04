@@ -124,3 +124,9 @@ alias proxychains="proxychains4"
 alias torstart="sudo systemctl start tor.service"
 alias torstop="sudo systemctl stop tor.service"
 alias torstatus="systemctl status tor.service"
+
+# Zsh config files are immutable (chattr +i) so installers can't append to or
+# rewrite them. zunlock before editing, zlock after.
+_zsh_config_files=(~/.zshrc ~/.zshenv ~/.zlogin ~/.zsh/*.zsh(N))
+zlock()   { pkexec chattr +i $_zsh_config_files && lsattr $_zsh_config_files; }
+zunlock() { pkexec chattr -i $_zsh_config_files && lsattr $_zsh_config_files; }
