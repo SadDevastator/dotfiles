@@ -45,7 +45,8 @@ config.mouse_bindings = {
 -------------------------------------------------
 -- GPU Acceleration
 -------------------------------------------------
-config.front_end = "WebGpu"
+-- OpenGL: ~63 MB PSS per window vs ~223 MB for WebGpu on the RTX (measured 2026-10-31)
+config.front_end = "OpenGL"
 
 -------------------------------------------------
 -- Tabs (transparent)

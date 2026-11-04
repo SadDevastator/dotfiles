@@ -16,3 +16,6 @@ source "${HOME}/.zsh/plugins.zsh"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+
+# bun completions
+[ -s "/home/saddevastator/.bun/_bun" ] && source "/home/saddevastator/.bun/_bun"

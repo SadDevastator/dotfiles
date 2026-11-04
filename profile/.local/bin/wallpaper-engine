@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# Wallpaper Engine wallpapers in noctalia's wallpaper panel.
+#   sync     link each Workshop wallpaper's preview into the panel's "Wallpaper Engine" folder as
+#            "<Title> [we-<id>].<ext>" (removes links for unsubscribed ones)
+#   apply    noctalia hooks.wallpaper_changed: a [we-<id>] pick starts that live
+#            wallpaper on $NOCTALIA_WALLPAPER_CONNECTOR; any other pick stops it
+#   system   link CachyOS and KDE system wallpapers into "CachyOS" / "KDE" folders
+#   startup  noctalia hooks.started: sync + system, then restore the current wallpaper
+# WE_DRY=1 prints the renderer command instead of running it.
+set -uo pipefail
+
+WORKSHOP=${WE_WORKSHOP:-/mnt/DATA/SteamLibrary/steamapps/workshop/content/431960}
+ASSETS=${WE_ASSETS:-/mnt/DATA/SteamLibrary/steamapps/common/wallpaper_engine/assets}
+GALLERY=${WE_GALLERY:-$HOME/Pictures/Wallpapers/Wallpaper Engine}  # its own folder in the panel
+LOG=$HOME/.cache/wallpaper-engine.log
+FPS=25  # matches the old Plasma plugin setting
+
+log() { printf '%s %s\n' "$(date '+%F %T')" "$*" >>"$LOG"; }
+
+sync() {
+    mkdir -p "$GALLERY"
+    local d id title preview ext name
+    declare -A keep=()
+    for d in "$WORKSHOP"/*/; do
+        id=$(basename "$d")
+        [[ -f $d/project.json ]] || continue
+        title=$(jq -r '.title // empty' "$d/project.json" 2>/dev/null)
+        preview=$(jq -r '.preview // empty' "$d/project.json" 2>/dev/null)
+        [[ -n $preview && -f $d/$preview ]] || continue
+        ext=${preview##*.}
+        title=${title//\//-}  # no slashes in file names
+        name="${title:-$id} [we-$id].$ext"
+        keep[$name]=1
+        ln -sfn "$d$preview" "$GALLERY/$name"
+    done
+    # Drop our links whose wallpaper is gone or was renamed; never touch real files
+    local f
+    for f in "$GALLERY"/*"[we-"*"]."*; do
+        [[ -L $f && -z ${keep[$(basename "$f")]:-} ]] && rm -f -- "$f"
+    done
+    return 0
+}
+
+# CachyOS and KDE wallpapers as panel folders (links only; stale links are pruned)
+SYSWALL=/usr/share/wallpapers
+link_set() {  # <folder> then "name|target" lines on stdin
+    local dir=$1 line name target f
+    mkdir -p "$dir"
+    declare -A keep=()
+    while IFS='|' read -r name target; do
+        [[ -n $name && -f $target ]] || continue
+        keep[$name]=1
+        ln -sfn "$target" "$dir/$name"
+    done
+    for f in "$dir"/*; do
+        [[ -L $f && -z ${keep[$(basename "$f")]:-} ]] && rm -f -- "$f"
+    done
+    return 0
+}
+best_kde_image() {  # largest image closest to 16:9 in a KDE images dir
+    local f wh w h
+    for f in "$1"/*; do
+        wh=$(basename "${f%.*}")  # "5120x2880" or "feathers3840x2160"
+        [[ $wh =~ ([0-9]+)x([0-9]+)$ ]] || continue
+        w=${BASH_REMATCH[1]}; h=${BASH_REMATCH[2]}
+        (( h > 0 )) || continue
+        # score: distance from 16:9 (x1000), then prefer larger width
+        printf '%d %d %s\n' "$(( (w*1000/h - 1777) < 0 ? 1777 - w*1000/h : w*1000/h - 1777 ))" "$((-w))" "$f"
+    done | sort -n -k1,1 -k2,2 | head -1 | cut -d' ' -f3-
+}
+sync_system() {
+    local base=${GALLERY%/*} f d n img
+    for f in "$SYSWALL"/cachyos-wallpapers/*; do printf '%s|%s\n' "$(basename "$f")" "$f"; done \
+        | link_set "$base/CachyOS"
+    for d in "$SYSWALL"/*/contents; do
+        n=$(basename "$(dirname "$d")")
+        img=$(best_kde_image "$d/images"); [[ -n $img ]] && printf '%s|%s\n' "$n.${img##*.}" "$img"
+        img=$(best_kde_image "$d/images_dark"); [[ -n $img ]] && printf '%s|%s\n' "$n (dark).${img##*.}" "$img"
+        true  # wallpapers without an images dir are skipped, not an error
+    done | link_set "$base/KDE"
+}
+
+connectors() {  # connected outputs, e.g. eDP-1
+    local s
+    for s in /sys/class/drm/card*-*/status; do
+        [[ $(<"$s") == connected ]] && basename "$(dirname "$s")" | sed 's/^card[0-9]*-//'
+    done
+}
+
+stop_on() { pkill -f "[l]inux-wallpaperengine --screen-root $1 " 2>/dev/null; }
+
+apply() {
+    local path=${NOCTALIA_WALLPAPER_PATH:-} conn=${NOCTALIA_WALLPAPER_CONNECTOR:-}
+    local outs id
+    if [[ -n $conn ]]; then outs=$conn; else outs=$(connectors); fi
+    if [[ $path =~ \[we-([0-9]+)\]\.[A-Za-z]+$ ]]; then
+        id=${BASH_REMATCH[1]}
+        for conn in $outs; do
+            local cmd=(linux-wallpaperengine --screen-root "$conn" --bg "$WORKSHOP/$id"
+                       --assets-dir "$ASSETS" --fps "$FPS" --silent --scaling fill
+                       --layer background)  # mango's blur samples only this layer
+            if [[ -n ${WE_DRY:-} ]]; then printf '%q ' "${cmd[@]}"; echo; continue; fi
+            stop_on "$conn"
+            log "start $id on $conn"
+            setsid -f "${cmd[@]}" >>"$LOG" 2>&1
+        done
+    else
+        for conn in $outs; do
+            [[ -n ${WE_DRY:-} ]] && { echo "stop $conn"; continue; }
+            stop_on "$conn" && log "stop on $conn (static wallpaper: ${path##*/})"
+        done
+    fi
+}
+
+case ${1:-} in
+    sync) sync ;;
+    system) sync_system ;;
+    apply) apply ;;
+    startup)
+        sync
+        sync_system
+        NOCTALIA_WALLPAPER_PATH=$(noctalia msg wallpaper-get 2>/dev/null) apply ;;
+    *) echo "usage: wallpaper-engine sync|system|apply|startup" >&2; exit 2 ;;
+esac

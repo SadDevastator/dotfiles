@@ -1,0 +1,29 @@
+# AI menu: a bar button that opens its own menu panel listing the entries in
+# ~/.config/ai-menu/apps.conf ("Name | command | term"; term = run in foot).
+id = "saddevastator/ai"
+name = "AI Menu"
+version = "1.0.0"
+plugin_api = 43
+author = "saddevastator"
+license = "MIT"
+dependencies = ["foot"]
+tags = ["ai", "bar", "panel"]
+icon = "sparkles"
+description = "Launch AI tools from a bar button's own menu; list in ~/.config/ai-menu/apps.conf."
+
+[[widget]]
+id = "button"
+entry = "button.luau"
+
+# Drops down from the bar button. Open with: noctalia msg panel-toggle saddevastator/ai:menu
+[[panel]]
+id = "menu"
+entry = "menu.luau"
+width = 340
+height = 300
+placement = "attached"
+# Fixed anchor under the bar's left group (where the AI button is). Not
+# open_near_click: a plugin widget's onClick doesn't update noctalia's last-click
+# position, so the menu opened at a stale spot unless that click was recent.
+position = "top_left"
+keyboard_focus = "on_demand"

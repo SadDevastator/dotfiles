@@ -172,33 +172,42 @@ mkdir -p "$BIN_DIR"
 ln -sf "$WEZ_DIR/target/release/wezterm" "$BIN_DIR/wezterm"
 success "WezTerm linked"
 
-# --- Copilot key → yazi → Claude (KDE Plasma) ---
-# The Copilot key sends Meta+Shift+XF86Assistant, which Qt can't bind; the xkb
-# option in ~/.config/xkb (copied above) remaps it to F23.
-if command -v kwriteconfig6 >/dev/null 2>&1; then
-	info "Setting up Copilot key launcher..."
-	mkdir -p "$HOME/.local/share/applications"
-	cat >"$HOME/.local/share/applications/yazi-claude.desktop" <<EOF
+# --- Yazi → Claude launcher (also bound to the Copilot key in mango's config) ---
+# Terminal apps opened as apps use foot; the default terminal stays WezTerm.
+info "Installing Yazi → Claude launcher..."
+mkdir -p "$HOME/.local/share/applications"
+cat >"$HOME/.local/share/applications/yazi-claude.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Yazi → Claude
 Comment=Pick a folder in yazi, then open Claude there
-Exec=$BIN_DIR/wezterm start --always-new-process -- $BIN_DIR/yazi-claude
+Exec=foot -e $BIN_DIR/yazi-claude
 Icon=utilities-terminal
 Terminal=false
 EOF
-	opts=$(kreadconfig6 --file kxkbrc --group Layout --key Options)
-	case ",$opts," in
-	*,custom:copilot_f23,*) ;;
-	*) kwriteconfig6 --file kxkbrc --group Layout --key Options "${opts:+$opts,}custom:copilot_f23" ;;
-	esac
-	kwriteconfig6 --file kxkbrc --group Layout --key ResetOldOptions true
-	kwriteconfig6 --file kglobalshortcutsrc --group services --group yazi-claude.desktop \
-		--key _launch $'Meta+Shift+F23\tMeta+F23'
-	success "Copilot key bound (log out and back in to apply)"
+success "Launcher installed"
+
+# --- noctalia plugins (keybinds panel, AI menu) ---
+cd "$SCRIPT_DIR" 2>/dev/null || cd "$DOTFILES_DIR"
+info "Installing noctalia plugins to ~/noctalia-plugins..."
+mkdir -p "$HOME/noctalia-plugins"
+cp -r noctalia-plugins/. "$HOME/noctalia-plugins/"
+if command -v noctalia >/dev/null 2>&1 && noctalia msg plugins source list >/dev/null 2>&1; then
+	noctalia msg plugins source list | grep -q '^local ' ||
+		noctalia msg plugins source add local path "$HOME/noctalia-plugins"
+	noctalia msg plugins enable saddevastator/keybinds >/dev/null
+	noctalia msg plugins enable saddevastator/ai >/dev/null
+	success "Plugins registered and enabled"
 else
-	warn "kwriteconfig6 not found (not KDE?), skipping Copilot key setup"
+	warn "noctalia not running: after login run 'noctalia msg plugins source add local path ~/noctalia-plugins' and enable saddevastator/keybinds + saddevastator/ai"
 fi
+
+# --- System-level setup (root, not run automatically) ---
+info "Optional root setup lives in system/ (review, then run with pkexec bash):"
+echo "    system/vpn-on-demand.sh   Tailscale + WARP start on first use (socket proxy)"
+echo "    system/idle-trim.sh       disable keyd/coolercontrold/lactd, ProtonVPN via D-Bus"
+echo "    system/greeter-swap.sh    noctalia-greeter on greetd instead of Plasma Login"
+echo "    system/etc/               zram-generator.conf, mango-nvidia.desktop session, greetd PAM (oo7)"
 
 echo
 success "All done! Restart your shell or run: exec zsh"

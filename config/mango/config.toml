@@ -1,0 +1,241 @@
+# mango (mangowc) config, ported from the caelestia/Hyprland setup.
+# Docs: https://mangowm.github.io/docs  ·  Check: mango -p -c ~/.config/mango/config.toml
+# Shell: noctalia does bar, launcher, notifications, lock, clipboard, OSD, night light,
+# polkit, screenshots and wallpaper. Prefer `noctalia msg ...` over extra packages.
+# NOTE: a ~/.config/mango/config.conf would override this file; don't create one.
+# Top-level tables ([global], [env], [var]) must come before any [bind.*]/[[rule.*]].
+
+[global]
+exec_once = [
+  # noctalia 5 is a native binary; the old noctalia-shell quickshell package is dead
+  # Give systemd/D-Bus-launched apps the session env (noctalia launches apps as
+  # systemd services). __EGL_VENDOR_LIBRARY_FILENAMES is deliberately NOT exported:
+  # inside Flatpaks that host path doesn't exist and GL would break.
+  "dbus-update-activation-environment --systemd PATH TERMINAL QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME QT_WAYLAND_DISABLE_WINDOWDECORATION QT_AUTO_SCREEN_SCALE_FACTOR GDK_BACKEND SDL_VIDEODRIVER CLUTTER_BACKEND ELECTRON_OZONE_PLATFORM_HINT _JAVA_AWT_WM_NONREPARENTING NO_AT_BRIDGE GTK_A11Y XDG_SESSION_DESKTOP",
+  # NVIDIA-only EGL skips loading Mesa (~11 MB); jemalloc returns freed memory sooner (~5 MB)
+  "env __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json MALLOC_CONF=narenas:1,background_thread:true,dirty_decay_ms:1000,muzzy_decay_ms:0 noctalia --daemon",
+  # KDE Connect (mango doesn't run XDG autostart entries; ~38 MB, kept on purpose)
+  "/usr/bin/kdeconnectd",
+]
+
+# Copilot key: remap to F23 via ~/.config/xkb (same option KDE uses)
+xkb_rules_layout = "us"
+xkb_rules_options = "custom:copilot_f23"
+repeat_rate = 25
+repeat_delay = 600
+numlock_on = 1
+
+# Xwayland only while an X11 app runs (starts on demand, ~27 MB when idle)
+xwayland_persistence = 0
+
+# Touchpad (from Hyprland: disable while typing, tap to click)
+tap_to_click = 1
+trackpad_disable_while_typing = 1
+trackpad_natural_scrolling = 0
+
+# Look: rounded, light gaps, blur behind noctalia panels
+border_radius = 8
+border_px = 2
+gap_inner_horizontal = 6
+gap_inner_vertical = 6
+gap_outer_horizontal = 12
+gap_outer_vertical = 12
+blur = 1
+blur_layer = 1
+# Off: optimized blur reuses a cached blur of the static background layer, so
+# translucent surfaces showed noctalia's still preview instead of the live
+# Wallpaper Engine wallpaper (which renders on a higher layer)
+blur_optimized = 0
+shadows = 1
+shadow_only_floating = 1
+focus_color = 0xc9b890ff
+border_color = 0x444444ff
+
+animations = 1
+layer_animations = 1
+animation_type_open = "zoom"
+animation_type_close = "slide"
+animation_duration_open = 300
+animation_duration_close = 300
+animation_duration_move = 300
+animation_duration_tag = 300
+
+tag_num = 9
+sloppy_focus = 1
+warp_cursor = 1
+focus_on_activate = 1
+cursor_size = 24
+idle_inhibit_when_fullscreen = 1
+scratchpad_width_ratio = 0.8
+scratchpad_height_ratio = 0.85
+
+[env]
+"XDG_CURRENT_DESKTOP" = "mango"
+"XDG_SESSION_TYPE" = "wayland"
+"XDG_SESSION_DESKTOP" = "mango"
+"GDK_BACKEND" = "wayland,x11"
+"QT_QPA_PLATFORM" = "wayland;xcb"
+"QT_QPA_PLATFORMTHEME" = "qt6ct"
+"QT_WAYLAND_DISABLE_WINDOWDECORATION" = "1"
+"QT_AUTO_SCREEN_SCALE_FACTOR" = "1"
+"SDL_VIDEODRIVER" = "wayland,x11"
+"CLUTTER_BACKEND" = "wayland"
+"ELECTRON_OZONE_PLATFORM_HINT" = "auto"
+"_JAVA_AWT_WM_NONREPARENTING" = "1"
+"XCURSOR_SIZE" = "24"
+# Terminal apps launched as apps (noctalia launcher, Terminal=true) open in foot
+"TERMINAL" = "foot"
+# No accessibility bus (at-spi): no screen reader in use
+"NO_AT_BRIDGE" = "1"
+"GTK_A11Y" = "none"
+
+[var]
+# Full paths: mango sessions don't load zsh, so ~/.local/bin may not be on PATH.
+# --always-new-process is deliberate (bounds a wezterm memory leak).
+term = "env __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json $HOME/.local/bin/wezterm start --always-new-process"  # default terminal (SUPER+T); apps use foot
+lock = "noctalia msg session lock"
+
+[bind.default]
+# Apps (Hyprland: SUPER+T/W/C/E, CTRL+ALT+V)
+"SUPER+t" = "spawn_shell,$term"  # Terminal
+"SUPER+w" = "spawn,brave"  # Browser
+"SUPER+c" = "spawn,zeditor"  # Editor
+"SUPER+e" = "spawn,dolphin"  # File manager
+"CTRL+ALT+v" = "spawn,pwvucontrol"  # Audio settings
+"SUPER+SHIFT+F23" = "spawn_shell,foot -e $HOME/.local/bin/yazi-claude"  # Yazi, then Claude in the chosen folder
+
+# Shell
+"SUPER+space" = "spawn,noctalia msg panel-toggle launcher"  # App launcher
+"CTRL+ALT+Delete" = "spawn,noctalia msg panel-toggle session"  # Power menu
+"SUPER+h" = "spawn,noctalia msg panel-toggle saddevastator/keybinds:panel"  # Keybinds cheat sheet
+"SUPER+l" = "spawn_shell,$lock"  # Lock screen
+"SUPER+SHIFT+n" = "spawn,noctalia msg nightlight-force-toggle"  # Toggle night light
+"SUPER+v" = "spawn,noctalia msg panel-toggle clipboard"  # Clipboard history
+
+# Screenshots
+"Print" = "spawn,noctalia msg screenshot-fullscreen"  # Screenshot
+"SUPER+SHIFT+s" = "spawn,noctalia msg screenshot-region"  # Region screenshot
+
+# Windows
+"SUPER+q" = "killclient,"  # Close window
+"SUPER+f" = "togglefullscreen,"  # Fullscreen
+"SUPER+ALT+f" = "togglemaximizescreen,"  # Maximize
+"SUPER+ALT+space" = "togglefloating,"  # Toggle floating
+"SUPER+p" = "toggleglobal,"  # Pin to all tags
+"CTRL+SUPER+backslash" = "centerwin,"  # Center window
+"ALT+Tab" = "focusstack,next"  # Next window
+"SHIFT+ALT+Tab" = "focusstack,prev"  # Previous window
+"SUPER+Left" = "focusdir,left"  # Focus left
+"SUPER+Right" = "focusdir,right"  # Focus right
+"SUPER+Up" = "focusdir,up"  # Focus up
+"SUPER+Down" = "focusdir,down"  # Focus down
+"SUPER+SHIFT+Left" = "exchange_client,left"  # Swap left
+"SUPER+SHIFT+Right" = "exchange_client,right"  # Swap right
+"SUPER+SHIFT+Up" = "exchange_client,up"  # Swap up
+"SUPER+SHIFT+Down" = "exchange_client,down"  # Swap down
+"SUPER+minus" = "resizewin,-50,+0"  # Narrower
+"SUPER+equal" = "resizewin,+50,+0"  # Wider
+"SUPER+SHIFT+minus" = "resizewin,+0,-50"  # Shorter
+"SUPER+SHIFT+equal" = "resizewin,+0,+50"  # Taller
+"SUPER+ALT+Left" = "resizewin,-50,+0"  # Narrower
+"SUPER+ALT+Right" = "resizewin,+50,+0"  # Wider
+"SUPER+ALT+Up" = "resizewin,+0,-50"  # Shorter
+"SUPER+ALT+Down" = "resizewin,+0,+50"  # Taller
+"SUPER+n" = "switch_layout"  # Next layout
+
+# Scratchpads (Hyprland special workspaces)
+"SUPER+s" = "toggle_scratchpad"  # Toggle scratchpad
+"CTRL+SHIFT+Escape" = "toggle_named_scratchpad,btop-scratch,none,foot --app-id btop-scratch btop"  # System monitor (btop)
+
+# Tags (Hyprland workspaces): SUPER+N view, SUPER+ALT+N move window
+"SUPER+1" = "view,1,0"  # Go to tag
+"SUPER+2" = "view,2,0"  # Go to tag
+"SUPER+3" = "view,3,0"  # Go to tag
+"SUPER+4" = "view,4,0"  # Go to tag
+"SUPER+5" = "view,5,0"  # Go to tag
+"SUPER+6" = "view,6,0"  # Go to tag
+"SUPER+7" = "view,7,0"  # Go to tag
+"SUPER+8" = "view,8,0"  # Go to tag
+"SUPER+9" = "view,9,0"  # Go to tag
+"SUPER+ALT+1" = "tag,1,0"  # Move window to tag
+"SUPER+ALT+2" = "tag,2,0"  # Move window to tag
+"SUPER+ALT+3" = "tag,3,0"  # Move window to tag
+"SUPER+ALT+4" = "tag,4,0"  # Move window to tag
+"SUPER+ALT+5" = "tag,5,0"  # Move window to tag
+"SUPER+ALT+6" = "tag,6,0"  # Move window to tag
+"SUPER+ALT+7" = "tag,7,0"  # Move window to tag
+"SUPER+ALT+8" = "tag,8,0"  # Move window to tag
+"SUPER+ALT+9" = "tag,9,0"  # Move window to tag
+"CTRL+SUPER+Left" = "viewtoleft,0"  # Previous tag
+"CTRL+SUPER+Right" = "viewtoright,0"  # Next tag
+"SUPER+Prior" = "viewtoleft,0"  # Previous tag
+"SUPER+Next" = "viewtoright,0"  # Next tag
+"CTRL+SUPER+SHIFT+Left" = "tagtoleft,0"  # Move window to previous tag
+"CTRL+SUPER+SHIFT+Right" = "tagtoright,0"  # Move window to next tag
+"SUPER+ALT+Prior" = "tagtoleft,0"  # Move window to previous tag
+"SUPER+ALT+Next" = "tagtoright,0"  # Move window to next tag
+
+# Compositor
+"CTRL+SUPER+ALT+r" = "reload_config"  # Reload config
+
+[bind.default.lock]
+# Media (also work on the lock screen)
+"XF86AudioRaiseVolume" = "spawn,noctalia msg volume-up"  # Volume up
+"XF86AudioLowerVolume" = "spawn,noctalia msg volume-down"  # Volume down
+"XF86AudioMute" = "spawn,noctalia msg volume-mute"  # Mute
+"SUPER+SHIFT+m" = "spawn,noctalia msg volume-mute"  # Mute
+"XF86AudioMicMute" = "spawn,noctalia msg mic-mute"  # Mute microphone
+"XF86AudioPlay" = "spawn,noctalia msg media toggle"  # Play / pause
+"XF86AudioNext" = "spawn,noctalia msg media next"  # Next track
+"XF86AudioPrev" = "spawn,noctalia msg media previous"  # Previous track
+"XF86MonBrightnessUp" = "spawn,noctalia msg brightness-up"  # Brightness up
+"XF86MonBrightnessDown" = "spawn,noctalia msg brightness-down"  # Brightness down
+
+[mousebind.default]
+# Mouse
+"SUPER+btn_left" = "moveresize,curmove"  # Drag to move window
+"SUPER+btn_right" = "moveresize,curresize"  # Drag to resize window
+
+[axisbind.default]
+# Scroll wheel
+"SUPER+UP" = "viewtoleft_have_client"  # Previous tag with windows
+"SUPER+DOWN" = "viewtoright_have_client"  # Next tag with windows
+
+[gesturebind.default]
+# Touchpad (3 fingers: focus, 4 fingers: tags/overview)
+"none+left+4" = "viewtoright,0"  # Next tag
+"none+right+4" = "viewtoleft,0"  # Previous tag
+"none+up+4" = "enteroverview"  # Overview
+"none+down+4" = "leaveoverview"  # Leave overview
+"none+left+3" = "focusdir,left"  # Focus left
+"none+right+3" = "focusdir,right"  # Focus right
+"none+up+3" = "focusdir,up"  # Focus up
+"none+down+3" = "focusdir,down"  # Focus down
+
+# Laptop panel: native 144 Hz mode (EDID: 1920x1080@144.001; mango otherwise picks 60)
+# with VRR across the panel's 48-144 Hz range
+[[rule.monitor_rule]]
+name = "eDP-1"
+width = 1920
+height = 1080
+refresh = 144.0
+vrr = 1
+
+[[rule.tag_rule]]
+id = 1
+layout_name = "tile"
+
+[[rule.window_rule]]
+app_id = "btop-scratch"
+is_named_scratchpad = 1
+width = 0.7
+height = 0.7
+
+[[rule.window_rule]]
+app_id = "^(pwvucontrol|com.saivert.pwvucontrol)$"
+is_floating = 1
+
+[[rule.window_rule]]
+title = "^Picture[- ]in[- ][Pp]icture$"
+is_floating = 1
+is_global = 1

@@ -12,3 +12,6 @@ export PATH="$HOME/.local/share/pnpm/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 typeset -gU path PATH
+# WezTerm/noctalia run with NVIDIA-only EGL to skip loading Mesa; don't pass it on:
+# inside Flatpaks that path doesn't exist and GL would break
+unset __EGL_VENDOR_LIBRARY_FILENAMES

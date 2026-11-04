@@ -1,0 +1,26 @@
+# Keybinds: a help button for the bar that opens a searchable panel of the mango
+# keybinds. Data comes from ~/.config/mango/keybinds.py --json, which reads the
+# labelled binds in ~/.config/mango/config.toml (single source of truth).
+id = "saddevastator/keybinds"
+name = "Keybinds"
+version = "1.0.0"
+plugin_api = 43
+author = "saddevastator"
+license = "MIT"
+dependencies = []
+tags = ["help"]
+icon = "help-circle"
+description = "Searchable panel of mango keybinds, opened from a help button on the bar."
+
+[[widget]]
+id = "button"
+entry = "button.luau"
+
+# Open with: noctalia msg panel-toggle saddevastator/keybinds:panel
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 600
+height = 680
+placement = "floating"
+position = "center"

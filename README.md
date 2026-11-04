@@ -8,12 +8,20 @@ Backup of my personal Linux user profile and application configuration files.
 .
 ├── install.sh          # Setup script
 ├── config/             # XDG config files (~/.config/)
+│   ├── ai-menu/        # AI menu entries (Name | command | term)
 │   ├── fastfetch/      # Fastfetch system info display
+│   ├── foot/           # foot (terminal apps), themed by noctalia
+│   ├── mango/          # mango compositor config + keybinds.py (help panel data)
+│   ├── noctalia/       # noctalia shell overrides
+│   ├── qt6ct/          # Qt theming (Breeze + noctalia palette)
 │   ├── tealdeer/       # Tealdeer (tldr) styling
 │   ├── topgrade.toml   # Topgrade, incl. WezTerm source-build step
-│   ├── xkb/            # Remaps the Copilot key to F23 so KDE can bind it
+│   ├── xkb/            # Remaps the Copilot key to F23
 │   └── yazi/           # Yazi keymap (Ctrl+Shift+Z: zoxide jump)
+├── noctalia-plugins/   # Local noctalia plugins: keybinds panel, AI menu
+├── system/             # Root-level setup scripts and /etc files (run manually)
 └── profile/            # Home directory dotfiles (~/  )
+    ├── .local/bin/wallpaper-engine  # Wallpaper Engine wallpapers in noctalia's panel
     ├── .local/bin/yazi-claude  # Copilot key: yazi, then Claude in the chosen folder
     ├── .wezterm.lua    # WezTerm terminal config
     ├── .zshenv         # Zsh environment variables (all shells)

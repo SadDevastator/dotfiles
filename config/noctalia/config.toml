@@ -1,0 +1,62 @@
+# noctalia overrides, merged over noctalia's defaults
+# (`noctalia config export full` lists every option).
+
+# Keybinds and AI buttons come from local plugins in ~/noctalia-plugins
+[bar.default]
+start = ["launcher", "saddevastator/keybinds:button", "saddevastator/ai:button", "wallpaper", "workspaces"]
+# Phone (KDE Connect) via the icefish/phone-connect community plugin, next to the tray
+end = ["media", "tray", "icefish/phone-connect:bar", "notifications", "clipboard", "network",
+       "bluetooth", "volume", "brightness", "battery", "control-center", "session"]
+
+# Theme foot (used for terminal apps) from the noctalia palette
+[theme.templates]
+builtin_ids = ["foot", "qt"]
+
+# noctalia is the polkit agent (no separate polkit-kde/gnome agent is started)
+[shell]
+polkit_agent = true
+# Apps get systemd's session env (mango exports it) instead of inheriting
+# noctalia's NVIDIA-only EGL setting, which breaks GL inside Flatpaks
+launch_apps_as_systemd_services = true
+
+# Suspend never wakes on this laptop (hard power-cycle). Every noctalia suspend
+# path (session panel, idle, `noctalia msg session suspend`) runs this instead.
+[shell.session.power]
+suspend = "notify-send -u critical 'Suspend is disabled' 'Wake is broken on this laptop'"
+
+# Lock at 5 min, screen off at 10 min. No suspend step.
+[idle.behavior.lock]
+timeout = 300
+action = "lock"
+enabled = true
+
+[idle.behavior.screen-off]
+timeout = 600
+action = "screen_off"
+enabled = true
+
+# Schedule off; mango's SUPER+SHIFT+N runs `noctalia msg nightlight-force-toggle`
+[nightlight]
+enabled = false
+
+# Dock styling: matches the bar (radius 12) and floats off the bottom like mango's 12px outer gap.
+# Behaviour stays smart auto-hide; pinned apps are managed in noctalia's GUI.
+[dock]
+radius = 12
+radius_top_left = 12
+radius_top_right = 12
+radius_bottom_left = 12
+radius_bottom_right = 12
+margin_edge = 12
+border_width = 1.0
+icon_size = 40
+magnification_scale = 1.25
+
+# Wallpaper Engine: Workshop previews are linked into this folder by
+# ~/.local/bin/wallpaper-engine; picking a "[we-<id>]" one starts it live.
+[wallpaper]
+directory = "/home/saddevastator/Pictures/Wallpapers"
+
+[hooks]
+wallpaper_changed = ["/home/saddevastator/.local/bin/wallpaper-engine apply"]
+started = ["/home/saddevastator/.local/bin/wallpaper-engine startup"]
