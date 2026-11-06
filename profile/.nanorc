@@ -1,0 +1,4 @@
+# Syntax highlighting: nano's bundled set, then nano-syntax-highlighting (AUR)
+# for toml, zig, zsh, PKGBUILD, systemd and more. Later files win on overlap.
+include "/usr/share/nano/*.nanorc"
+include "/usr/share/nano-syntax-highlighting/*.nanorc"

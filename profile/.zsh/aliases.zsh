@@ -61,6 +61,7 @@ alias jctl="journalctl -p 3 -xb"
 alias rip="expac --timefmt='%Y-%m-%d %T' '%l	%n %v' | sort | tail -200 | nl"
 alias path='printf "%s\n" ${(s/:/)PATH}'
 alias please="sudo"
+alias nano="nano -/"
 alias no="nano"
 alias ani="viu"
 alias calc="bc -l"
