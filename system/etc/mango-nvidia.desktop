@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=Mango (NVIDIA EGL)
-Comment=mango without loading Mesa EGL (NVIDIA only)
-Exec=env __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json mango
-DesktopNames=mango;wlroots
-Type=Application

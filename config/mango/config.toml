@@ -12,8 +12,10 @@ exec_once = [
   # systemd services). __EGL_VENDOR_LIBRARY_FILENAMES is deliberately NOT exported:
   # inside Flatpaks that host path doesn't exist and GL would break.
   "dbus-update-activation-environment --systemd PATH TERMINAL QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME QT_WAYLAND_DISABLE_WINDOWDECORATION QT_AUTO_SCREEN_SCALE_FACTOR GDK_BACKEND SDL_VIDEODRIVER CLUTTER_BACKEND ELECTRON_OZONE_PLATFORM_HINT _JAVA_AWT_WM_NONREPARENTING NO_AT_BRIDGE GTK_A11Y XDG_SESSION_DESKTOP",
-  # NVIDIA-only EGL skips loading Mesa (~11 MB); jemalloc returns freed memory sooner (~5 MB)
-  "env __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json MALLOC_CONF=narenas:1,background_thread:true,dirty_decay_ms:1000,muzzy_decay_ms:0 noctalia --daemon",
+  # jemalloc returns freed memory sooner (~5 MB). No NVIDIA-only EGL here: noctalia
+  # passes its env to apps it launches, and Epic (and apps like it) then skip their
+  # own NVIDIA workarounds and break.
+  "env -u __EGL_VENDOR_LIBRARY_FILENAMES MALLOC_CONF=narenas:1,background_thread:true,dirty_decay_ms:1000,muzzy_decay_ms:0 noctalia --daemon",
   # KDE Connect (mango doesn't run XDG autostart entries; ~38 MB, kept on purpose)
   "/usr/bin/kdeconnectd",
 ]

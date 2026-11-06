@@ -207,7 +207,7 @@ info "Optional root setup lives in system/ (review, then run with pkexec bash):"
 echo "    system/vpn-on-demand.sh   Tailscale + WARP start on first use (socket proxy)"
 echo "    system/idle-trim.sh       disable keyd/coolercontrold/lactd, ProtonVPN via D-Bus"
 echo "    system/greeter-swap.sh    noctalia-greeter on greetd instead of Plasma Login"
-echo "    system/etc/               zram-generator.conf, mango-nvidia.desktop session, greetd PAM (oo7)"
+echo "    system/etc/               zram-generator.conf, greetd PAM (oo7)"
 
 echo
 success "All done! Restart your shell or run: exec zsh"
