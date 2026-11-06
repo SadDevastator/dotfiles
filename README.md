@@ -49,7 +49,7 @@ bash <(curl -sSL https://raw.githubusercontent.com/SadDevastator/dotfiles/main/i
 **Or clone and run locally:**
 
 ```bash
-git clone https://github.com/SadDevastator/profile ~/.dotfiles
+git clone https://github.com/SadDevastator/dotfiles ~/.dotfiles
 bash ~/.dotfiles/install.sh
 ```
 

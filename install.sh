@@ -14,7 +14,7 @@ success() { echo "${GREEN}${BOLD} ✔${RESET} $1"; }
 warn() { echo "${YELLOW}${BOLD} !${RESET} $1"; }
 error() { echo "${RED}${BOLD} ✘${RESET} $1"; }
 
-REPO_URL="https://github.com/SadDevastator/profile"
+REPO_URL="https://github.com/SadDevastator/dotfiles"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 
 # --- Clone or locate repo ---
